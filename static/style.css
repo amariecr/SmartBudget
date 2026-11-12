@@ -1,0 +1,171 @@
+
+:root {
+    font-family: system-ui, sans-serif;
+    color: #223044;
+    background: #f4f6fa;
+}
+
+/* General layout */
+body {
+    margin: 0;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1f3a5f;
+    color: white;
+    padding: 16px 6%;
+}
+
+header a {
+    color: white;
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+main {
+    max-width: 1080px;
+    margin: 32px auto;
+    padding: 0 18px;
+}
+
+/* Cards and panels */
+.panel {
+    background: white;
+    border: 1px solid #e1e6ee;
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 6px #142b4510;
+}
+
+.auth {
+    max-width: 420px;
+    margin: 50px auto;
+}
+
+/* Forms */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+form.inline {
+    display: inline;
+}
+
+label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+input,
+select {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    border: 1px solid #bdc8d4;
+    border-radius: 7px;
+    margin-top: 5px;
+}
+
+/* Buttons */
+button {
+    background: #1667aa;
+    color: white;
+    border: 0;
+    border-radius: 7px;
+    padding: 9px 15px;
+    cursor: pointer;
+}
+
+button.danger {
+    background: #ad3440;
+    margin-left: 8px;
+}
+
+/* Dashboard layout */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.stats h2 {
+    margin: 8px 0;
+}
+
+/* Budget and savings progress */
+.track {
+    height: 10px;
+    border-radius: 6px;
+    background: #e2eaf4;
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.track > div {
+    height: 100%;
+    background: #2b8a76;
+}
+
+.budget,
+.goal {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid #e7ecf2;
+}
+
+.warning {
+    color: #b72c3b;
+    font-weight: 700;
+    margin-left: 8px;
+}
+
+/* Transaction list */
+.entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #e8edf3;
+    gap: 12px;
+}
+
+/* Messages */
+.flash {
+    padding: 12px;
+    border-radius: 8px;
+    background: #dff3e6;
+}
+
+.flash.error {
+    background: #ffe2e5;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 700px) {
+    .stats,
+    .columns {
+        grid-template-columns: 1fr;
+    }
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0;
+    background-color: #2b8a76;
+    transition: width 0.3s ease;
+}

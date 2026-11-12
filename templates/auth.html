@@ -1,0 +1,80 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="panel auth">
+
+    <h1>
+        {{ 'Create account' if mode == 'register' else 'Log in' }}
+    </h1>
+
+    <form method="post">
+
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
+
+        {% if mode == 'register' %}
+
+        <label>
+            Name
+
+            <input
+                type="text"
+                name="username"
+                maxlength="80"
+                required
+            >
+        </label>
+
+        {% endif %}
+
+        <label>
+            Email
+
+            <input
+                type="email"
+                name="email"
+                required
+            >
+        </label>
+
+        <label>
+            Password
+
+            <input
+                type="password"
+                name="password"
+                minlength="8"
+                required
+            >
+        </label>
+
+        <button type="submit">
+            {{ 'Register' if mode == 'register' else 'Log in' }}
+        </button>
+
+    </form>
+
+    <p>
+        {% if mode == 'register' %}
+
+            <a href="{{ url_for('login') }}">
+                Already registered? Log in
+            </a>
+
+        {% else %}
+
+            <a href="{{ url_for('register') }}">
+                Create an account
+            </a>
+
+        {% endif %}
+    </p>
+
+</section>
+
+{% endblock %}

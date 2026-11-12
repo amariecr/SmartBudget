@@ -1,0 +1,407 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Your budget dashboard</h1>
+
+<!-- Month selection -->
+<form method="get">
+
+    <label>
+        View month
+
+        <input
+            type="month"
+            name="month"
+            value="{{ month }}"
+        >
+    </label>
+
+    <button type="submit">Go</button>
+
+</form>
+
+
+<!-- Financial summary -->
+<div class="stats">
+
+    <div class="panel">
+        <small>Income</small>
+
+        <h2>
+            ${{ '%.2f'|format(income) }}
+        </h2>
+    </div>
+
+    <div class="panel">
+        <small>Expenses</small>
+
+        <h2>
+            ${{ '%.2f'|format(expenses) }}
+        </h2>
+    </div>
+
+    <div class="panel">
+        <small>Income minus expenses</small>
+
+        <h2>
+            ${{ '%.2f'|format(income - expenses) }}
+        </h2>
+    </div>
+
+</div>
+
+
+<!-- Transactions and budgets -->
+<div class="columns">
+
+    <!-- Add transaction -->
+    <section class="panel">
+
+        <h2>Add transaction</h2>
+
+        <form
+            action="{{ url_for('add_transaction') }}"
+            method="post"
+        >
+
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}"
+            >
+
+            <label>
+                Type
+
+                <select name="kind">
+                    <option value="expense">Expense</option>
+                    <option value="income">Income</option>
+                </select>
+            </label>
+
+            <label>
+                Category
+
+                <input
+                    name="category"
+                    placeholder="Groceries, Paycheck..."
+                    required
+                >
+            </label>
+
+            <label>
+                Amount ($)
+
+                <input
+                    type="number"
+                    name="amount"
+                    step="0.01"
+                    min="0.01"
+                    required
+                >
+            </label>
+
+            <label>
+                Date
+
+                <input
+                    type="date"
+                    name="date"
+                    value="{{ month }}-01"
+                    required
+                >
+            </label>
+
+            <label>
+                Description
+
+                <input name="description">
+            </label>
+
+            <button type="submit">
+                Add transaction
+            </button>
+
+        </form>
+    </section>
+
+
+    <!-- Monthly budgets -->
+    <section class="panel">
+
+        <h2>Set monthly budget</h2>
+
+        <form
+            action="{{ url_for('save_budget') }}"
+            method="post"
+        >
+
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}"
+            >
+
+            <input
+                type="hidden"
+                name="month"
+                value="{{ month }}"
+            >
+
+            <label>
+                Expense category
+
+                <input
+                    name="category"
+                    placeholder="Groceries"
+                    required
+                >
+            </label>
+
+            <label>
+                Monthly limit ($)
+
+                <input
+                    type="number"
+                    name="limit_amount"
+                    step="0.01"
+                    min="0.01"
+                    required
+                >
+            </label>
+
+            <button type="submit">
+                Save budget
+            </button>
+
+        </form>
+
+
+        <h3>Budget status</h3>
+
+        {% for b in budgets %}
+
+            {% set used = spending.get(b.category, 0) %}
+
+            <div class="budget">
+
+                <strong>{{ b.category }}</strong>:
+
+                ${{ '%.2f'|format(used) }}
+                /
+                ${{ '%.2f'|format(b.limit_amount) }}
+
+                {% if used > b.limit_amount %}
+
+                    <span class="warning">
+                        Over by
+                        ${{ '%.2f'|format(used - b.limit_amount) }}
+                    </span>
+
+                {% endif %}
+
+                <div class="track">
+
+                    {% set budget_percent = (used / b.limit_amount * 100) if b.limit_amount > 0 else 0 %}
+                    {% set budget_percent = [budget_percent, 100]|min %}
+
+                    <div class="track">
+                        <div
+                            class="progress-fill"
+                            data-progress="{{ budget_percent }}">
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <p>No budgets set for this month.</p>
+
+        {% endfor %}
+
+    </section>
+
+</div>
+
+
+<!-- Transaction history and savings goals -->
+<div class="columns">
+
+    <!-- Transactions -->
+    <section class="panel">
+
+        <h2>Transactions</h2>
+
+        {% for t in transactions %}
+
+            <div class="entry">
+
+                <div>
+                    <strong>{{ t.category }}</strong>
+                    — {{ t.kind }}
+
+                    <br>
+
+                    <small>
+                        {{ t.date }}
+
+                        {% if t.description %}
+                            · {{ t.description }}
+                        {% endif %}
+                    </small>
+                </div>
+
+                <div>
+
+                    ${{ '%.2f'|format(t.amount) }}
+
+                    <form
+                        class="inline"
+                        action="{{ url_for('delete_transaction', transaction_id=t.id) }}"
+                        method="post"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
+                        <button
+                            type="submit"
+                            class="danger"
+                        >
+                            Delete
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <p>No transactions this month.</p>
+
+        {% endfor %}
+
+    </section>
+
+
+    <!-- Savings goals -->
+    <section class="panel">
+
+        <h2>Savings goals</h2>
+
+        <form
+            action="{{ url_for('add_goal') }}"
+            method="post"
+        >
+
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}"
+            >
+
+            <label>
+                Goal name
+
+                <input
+                    name="name"
+                    placeholder="Emergency fund"
+                    required
+                >
+            </label>
+
+            <label>
+                Target ($)
+
+                <input
+                    type="number"
+                    name="target_amount"
+                    min="0.01"
+                    step="0.01"
+                    required
+                >
+            </label>
+
+            <button type="submit">
+                Create goal
+            </button>
+
+        </form>
+
+
+        {% for goal in goals %}
+
+            {% set saved = totals.get(goal.id, 0) %}
+
+            <div class="goal">
+
+                <strong>{{ goal.name }}</strong>
+
+                <p>
+                    ${{ '%.2f'|format(saved) }}
+                    /
+                    ${{ '%.2f'|format(goal.target_amount) }}
+                </p>
+
+                <div class="track">
+
+                    {% set goal_percent = (saved / goal.target_amount * 100) if goal.target_amount > 0 else 0 %}
+                    {% set goal_percent = [goal_percent, 100]|min %}
+
+                    <div class="track">
+                        <div
+                            class="progress-fill"
+                            data-progress="{{ goal_percent }}">
+                        </div>
+                    </div>
+
+                </div>
+
+                <form
+                    method="post"
+                    action="{{ url_for('contribute', goal_id=goal.id) }}"
+                >
+
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}"
+                    >
+
+                    <label>
+                        Add contribution ($)
+
+                        <input
+                            name="amount"
+                            type="number"
+                            min="0.01"
+                            step="0.01"
+                            required
+                        >
+                    </label>
+
+                    <button type="submit">
+                        Record contribution
+                    </button>
+
+                </form>
+
+            </div>
+
+        {% endfor %}
+
+    </section>
+
+</div>
+
+{% endblock %}
