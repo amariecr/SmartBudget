@@ -245,7 +245,7 @@ def create_app(config=None):
             amount=amount,
             date=date.today(),
             description=f'Contribution to savings goal: {goal.name}',
-            user_id=current_user_id
+            user_id=current_user.id
         )
 
         db.session.add(expense_transaction)
