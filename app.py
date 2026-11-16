@@ -238,6 +238,18 @@ def create_app(config=None):
             flash('Enter a valid contribution.', 'error')
             return redirect(url_for('dashboard'))
         db.session.add(SavingsContribution(goal_id=goal.id, amount=amount, date=date.today()))
+
+        expense_transaction = Transaction(
+            kind='expense',
+            category='Savings',
+            amount=amount,
+            date=date.today(),
+            description=f'Contribution to savings goal: {goal.name}',
+            user_id=current_user_id
+        )
+
+        db.session.add(expense_transaction)
+        
         db.session.commit()
         flash('Contribution recorded.', 'success')
         return redirect(url_for('dashboard'))
